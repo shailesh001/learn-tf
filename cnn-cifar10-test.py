@@ -7,7 +7,7 @@ import tensorflow as tf
 # Data files from https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz
 
 DATA_PATH = '/tmp/cifar10'
-STEPS = 5000
+STEPS = 100000
 BATCH_SIZE = 100
 
 def weight_variable(shape):
@@ -95,25 +95,36 @@ def main():
     y_ = tf.placeholder(tf.float32, shape=[None, 10])
     keep_prob = tf.placeholder(tf.float32)
 
-    conv1 = conv_layer(x, shape=[5, 5, 3, 32])
-    conv1_pool = max_pool_2x2(conv1)
+    C1, C2, C3 = 30, 50, 80
+    F1 = 500
 
-    conv2 = conv_layer(conv1_pool, shape=[5, 5, 32, 64])
-    conv2_pool = max_pool_2x2(conv2)
-    #conv2_flat = tf.reshape(conv2_pool, [-1, 8 * 8 * 64])
+    conv1_1 = conv_layer(x, shape=[3, 3, 3, C1])
+    conv1_2 = conv_layer(conv1_1, shape=[3, 3, C1, C1])
+    conv1_3 = conv_layer(conv1_2, shape=[3, 3, C1, C1])
+    conv1_pool = max_pool_2x2(conv1_3)
+    conv1_drop = tf.nn.dropout(conv1_pool, keep_prob=keep_prob)
 
-    conv3 = conv_layer(conv2_pool, shape=[5, 5, 64, 128])
-    conv3_pool = max_pool_2x2(conv3)
-    conv3_flat = tf.reshape(conv3_pool, [-1, 4 * 4 * 128])
+    conv2_1 = conv_layer(conv1_drop, shape=[3, 3, C1, C2])
+    conv2_2 = conv_layer(conv2_1, shape=[3, 3, C2, C2])
+    conv2_3 = conv_layer(conv2_2, shape=[3, 3, C2, C2])
+    conv2_pool = max_pool_2x2(conv2_3)
+    conv2_drop = tf.nn.dropout(conv2_pool, keep_prob=keep_prob)
+
+    conv3_1 = conv_layer(conv2_drop, shape=[3, 3, C2, C3])
+    conv3_2 = conv_layer(conv3_1, shape=[3, 3, C3, C3])
+    conv3_3 = conv_layer(conv3_2, shape=[3, 3, C3, C3])
+    conv3_pool = tf.nn.max_pool(conv3_3, ksize=[1, 8, 8, 1], strides=[1, 8, 8, 1], padding='SAME')
+    conv3_flat = tf.reshape(conv3_pool, [-1, C3])
     conv3_drop = tf.nn.dropout(conv3_flat, keep_prob=keep_prob)
 
-    full_1 = tf.nn.relu(full_layer(conv3_drop, 512))
-    full1_drop = tf.nn.dropout(full_1, keep_prob=keep_prob)
+    full1 = tf.nn.relu(full_layer(conv3_flat, F1))
+    full1_drop = tf.nn.dropout(full1, keep_prob=keep_prob)
 
     y_conv = full_layer(full1_drop, 10)
 
     cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=y_conv, labels=y_))
-    train_step = tf.train.AdamOptimizer(1e-3).minimize(cross_entropy)
+    train_step = tf.train.AdamOptimizer(0.0001).minimize(cross_entropy)
+    #train_step = tf.train.GradientDescentOptimizer(0.001).minimize(cross_entropy)
 
     correct_prediction = tf.equal(tf.argmax(y_conv, 1), tf.argmax(y_, 1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
