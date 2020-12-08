@@ -5,6 +5,6 @@ print("GPU Available: ", tf.test.is_gpu_available())
 
 
 if tf.test.is_gpu_available(cuda_only=False, min_cuda_compute_capability=None):
-    print('GPU')
+    print('GPU Available')
 else:
-    print('No GPU')
+    print('No GPU Available')
