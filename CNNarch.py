@@ -57,8 +57,6 @@ model.compile(
     metrics=['accuracy'],
 )
 
-model.fit(
-    ds_train,
-    epochs=24,
-    validation_data=ds_test,
-)
+#with tf.device('/gpu:0'):
+#with tf.device('/cpu:0'):
+	model.fit(ds_train,epochs=12,validation_data=ds_test,)
