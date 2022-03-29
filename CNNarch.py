@@ -59,4 +59,4 @@ model.compile(
 
 #with tf.device('/gpu:0'):
 #with tf.device('/cpu:0'):
-model.fit(ds_train,epochs=14,validation_data=ds_test,)
+model.fit(ds_train,epochs=24,validation_data=ds_test,)
