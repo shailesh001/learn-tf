@@ -1,7 +1,8 @@
-import tensorflow.compat.v2 as tf
+#import tensorflow.compat.v2 as tf
+import tensorflow as tf
 import tensorflow_datasets as tfds
 
-tf.enable_v2_behavior()
+#tf.enable_v2_behavior()
 
 from tensorflow.python.framework.ops import disable_eager_execution
 disable_eager_execution()
@@ -57,4 +58,4 @@ model.compile(
 
 #with tf.device('/cpu:0'):
 with tf.device('/gpu:0'):
-    model.fit(ds_train,epochs=24,validation_data=ds_test,)
+    model.fit(ds_train, epochs=24, validation_data=ds_test,)
