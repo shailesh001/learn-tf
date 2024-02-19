@@ -52,10 +52,11 @@ model = tf.keras.models.Sequential([
 ])
 model.compile(
     loss='sparse_categorical_crossentropy',
-    optimizer=tf.keras.optimizers.Adam(0.001),
+    optimizer="adam",
+    #optimizer=tf.keras.optimizers.Adam(0.001),
     metrics=['accuracy'],
 )
 
 #with tf.device('/cpu:0'):
-with tf.device('/gpu:0'):
-    model.fit(ds_train, epochs=24, validation_data=ds_test,)
+#with tf.device('/gpu:0'):
+model.fit(ds_train, epochs=24, validation_data=ds_test,)
